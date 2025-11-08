@@ -171,6 +171,7 @@ footer{
 <div class="pagination">
   <button id="prevBtn">Previous</button>
   <button id="nextBtn">Next</button>
+  <button id="sortBtn">Urutkan ⬇️</button>
 </div>
 
 <footer>© 2025 Dynotic ID</footer>
@@ -180,17 +181,18 @@ const itemsPerPage = 10;
 let currentPage = 1;
 let transactions = [];
 let filteredTransactions = [];
+let isDescending = true; // default: terbaru di atas
 
 const transactionList = document.getElementById('transactionList');
 const searchInput = document.getElementById('searchInput');
 const noResult = document.getElementById('noResult');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
+const sortBtn = document.getElementById('sortBtn');
 
-// Load provider.json
 async function loadData(){
   try{
-    const response = await fetch('provider.json');
+    const response = await fetch('provider.json?_=' + new Date().getTime()); // cegah cache
     const rawData = await response.json();
     transactions = rawData.map(item => ({
       tanggal: item["Laporan Transaksi 08-11-2025 - 08-11-2025"] || "-",
@@ -205,6 +207,9 @@ async function loadData(){
       harga_laba: item["__EMPTY_8"] ? "Rp" + item["__EMPTY_8"].toLocaleString("id-ID") : "-",
       status: item["__EMPTY_9"] || "-"
     }));
+
+    // default: terbaru di atas
+    if(isDescending) transactions.reverse();
     filteredTransactions = [...transactions];
     renderTransactions();
   }catch(err){
@@ -264,7 +269,21 @@ nextBtn.addEventListener('click',()=>{
   if(currentPage<Math.ceil(filteredTransactions.length/itemsPerPage)){currentPage++;renderTransactions();}
 });
 
+// Tombol urutkan
+sortBtn.addEventListener('click',()=>{
+  isDescending = !isDescending;
+  transactions.reverse();
+  filteredTransactions.reverse();
+  sortBtn.textContent = isDescending ? 'Urutkan ⬇️' : 'Urutkan ⬆️';
+  currentPage = 1;
+  renderTransactions();
+});
+
+// Auto-refresh tiap 30 detik
+setInterval(loadData, 30000);
+
 loadData();
 </script>
+
 </body>
 </html>
