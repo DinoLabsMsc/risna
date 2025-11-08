@@ -171,7 +171,6 @@ footer{
 <div class="pagination">
   <button id="prevBtn">Previous</button>
   <button id="nextBtn">Next</button>
-  <button id="sortBtn">Urutkan ⬇️</button>
 </div>
 
 <footer>© 2025 Dynotic ID</footer>
@@ -181,14 +180,12 @@ const itemsPerPage = 10;
 let currentPage = 1;
 let transactions = [];
 let filteredTransactions = [];
-let isDescending = true; // default: terbaru di atas
 
 const transactionList = document.getElementById('transactionList');
 const searchInput = document.getElementById('searchInput');
 const noResult = document.getElementById('noResult');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
-const sortBtn = document.getElementById('sortBtn');
 
 async function loadData(){
   try{
@@ -208,8 +205,9 @@ async function loadData(){
       status: item["__EMPTY_9"] || "-"
     }));
 
-    // default: terbaru di atas
-    if(isDescending) transactions.reverse();
+    // urutkan terbaru di atas
+    transactions.reverse();
+
     filteredTransactions = [...transactions];
     renderTransactions();
   }catch(err){
@@ -269,17 +267,7 @@ nextBtn.addEventListener('click',()=>{
   if(currentPage<Math.ceil(filteredTransactions.length/itemsPerPage)){currentPage++;renderTransactions();}
 });
 
-// Tombol urutkan
-sortBtn.addEventListener('click',()=>{
-  isDescending = !isDescending;
-  transactions.reverse();
-  filteredTransactions.reverse();
-  sortBtn.textContent = isDescending ? 'Urutkan ⬇️' : 'Urutkan ⬆️';
-  currentPage = 1;
-  renderTransactions();
-});
-
-// Auto-refresh tiap 30 detik
+// auto-refresh tiap 30 detik
 setInterval(loadData, 30000);
 
 loadData();
