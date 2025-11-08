@@ -50,13 +50,14 @@ h1{
 table{
   width:100%;
   border-collapse:collapse;
-  table-layout:fixed;
+  table-layout:auto;
+  min-width:1000px;
   background:transparent;
 }
 th,td{
   padding:14px 10px;
   border:1px solid #fff;
-  text-align:left;
+  text-align:center;
   word-wrap:break-word;
   background:rgba(0,0,0,0.2);
   color:#fff;
@@ -111,47 +112,37 @@ footer{
   color: rgba(255,255,255,0.6);
   text-align:center;
 }
-#loadingAnime{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.85);
-  display:flex;justify-content:center;align-items:center;
-  flex-direction:column;
-  z-index:9999;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 0.4s ease;
-}
-#loadingAnime img{
-  width:130px;
-  height:130px;
-  margin-bottom:14px;
-}
-#loadingAnime span{
-  font-size:1.4rem;
-  color:#fff;
-  font-weight:700;
-}
+
+/* Mobile Responsive */
 @media (max-width:992px){
-  th,td{font-size:0.9rem;padding:10px 6px;}
-  .search-box{padding:10px 14px;}
-  .pagination button{padding:6px 12px;font-size:0.85rem;}
+  th,td{
+    font-size:0.9rem;
+    padding:10px 6px;
+  }
+  .search-box{
+    padding:10px 14px;
+  }
+  .pagination button{
+    padding:6px 12px;
+    font-size:0.85rem;
+  }
 }
 @media (max-width:576px){
-  th,td{font-size:0.8rem;padding:8px 4px;}
-  .search-box input{font-size:0.9rem;}
+  th,td{
+    font-size:0.8rem;
+    padding:8px 4px;
+  }
+  .search-box input{
+    font-size:0.9rem;
+  }
 }
 </style>
 </head>
 <body>
 
-<div id="loadingAnime">
-  <img src="https://i.imgur.com/897ShGy.gif" alt="Anime Joget">
-  <span>Loading...</span>
-</div>
-
 <h1>Daftar Transaksi</h1>
 <div class="search-box">
-  <input type="text" id="searchInput" placeholder="Cari ID, Provider, Produk...">
+  <input type="text" id="searchInput" placeholder="Cari berdasarkan ID, Provider, Produk...">
 </div>
 
 <div class="table-container">
@@ -195,12 +186,25 @@ const searchInput = document.getElementById('searchInput');
 const noResult = document.getElementById('noResult');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
-const loadingAnime = document.getElementById('loadingAnime');
 
+// Load provider.json
 async function loadData(){
   try{
     const response = await fetch('provider.json');
-    transactions = await response.json();
+    const rawData = await response.json();
+    transactions = rawData.map(item => ({
+      tanggal: item["Laporan Transaksi 08-11-2025 - 08-11-2025"] || "-",
+      trxid: item["__EMPTY"] || "-",
+      kode: item["__EMPTY_1"] || "-",
+      provider: item["__EMPTY_2"] || "-",
+      voucher: item["__EMPTY_3"] || "-",
+      no_tujuan: item["__EMPTY_4"] || "-",
+      sn: item["__EMPTY_5"] || "-",
+      harga_beli: item["__EMPTY_6"] ? "Rp" + item["__EMPTY_6"].toLocaleString("id-ID") : "-",
+      harga_jual: item["__EMPTY_7"] ? "Rp" + item["__EMPTY_7"].toLocaleString("id-ID") : "-",
+      harga_laba: item["__EMPTY_8"] ? "Rp" + item["__EMPTY_8"].toLocaleString("id-ID") : "-",
+      status: item["__EMPTY_9"] || "-"
+    }));
     filteredTransactions = [...transactions];
     renderTransactions();
   }catch(err){
@@ -218,17 +222,17 @@ function renderTransactions(){
   pageItems.forEach(t=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${t["Laporan Transaksi 08-11-2025 - 08-11-2025"] || ''}</td>
-      <td>${t["__EMPTY"] || ''}</td>
-      <td>${t["__EMPTY_1"] || ''}</td>
-      <td>${t["__EMPTY_2"] || ''}</td>
-      <td>${t["__EMPTY_3"] || ''}</td>
-      <td>${t["__EMPTY_4"] || ''}</td>
-      <td>${t["__EMPTY_5"] || ''}</td>
-      <td>${t["__EMPTY_6"] || ''}</td>
-      <td>${t["__EMPTY_7"] || ''}</td>
-      <td>${t["__EMPTY_8"] || ''}</td>
-      <td>${t["__EMPTY_9"] || ''}</td>
+      <td>${t.tanggal}</td>
+      <td>${t.trxid}</td>
+      <td>${t.kode}</td>
+      <td>${t.provider}</td>
+      <td>${t.voucher}</td>
+      <td>${t.no_tujuan}</td>
+      <td>${t.sn}</td>
+      <td>${t.harga_beli}</td>
+      <td>${t.harga_jual}</td>
+      <td>${t.harga_laba}</td>
+      <td>${t.status}</td>
     `;
     transactionList.appendChild(tr);
   });
@@ -243,9 +247,10 @@ searchInput.addEventListener('input',()=>{
   searchTimeout = setTimeout(()=>{
     const query = searchInput.value.toLowerCase();
     filteredTransactions = transactions.filter(t =>
-      (t["__EMPTY"]?.toString().toLowerCase().includes(query)) ||
-      (t["__EMPTY_2"]?.toLowerCase().includes(query)) ||
-      (t["__EMPTY_3"]?.toLowerCase().includes(query))
+      (t.trxid.toString().includes(query)) ||
+      (t.kode.toLowerCase().includes(query)) ||
+      (t.provider.toLowerCase().includes(query)) ||
+      (t.voucher.toLowerCase().includes(query))
     );
     currentPage = 1;
     renderTransactions();
@@ -257,11 +262,6 @@ prevBtn.addEventListener('click',()=>{
 });
 nextBtn.addEventListener('click',()=>{
   if(currentPage<Math.ceil(filteredTransactions.length/itemsPerPage)){currentPage++;renderTransactions();}
-});
-
-window.addEventListener('pageshow', () => {
-  loadingAnime.style.opacity = '0';
-  loadingAnime.style.pointerEvents = 'none';
 });
 
 loadData();
