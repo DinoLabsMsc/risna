@@ -1,14 +1,15 @@
-{
-  "Laporan Transaksi 08-11-2025 - 08-11-2025": "08/11/2025 09:09",
-  "__EMPTY": 983251163,
-  "__EMPTY_1": "SP20",
-  "__EMPTY_2": "Telkomsel",
-  "__EMPTY_3": "Telkomsel Promo 20.000",
-  "__EMPTY_4": "082364236527",
-  "__EMPTY_5": "03964900000811008379",
-  "__EMPTY_6": 19829,
-  "__EMPTY_7": 20671,
-  "__EMPTY_8": 862,
-  "__EMPTY_9": "Sukses"
-}
+[
+  {
+    "Laporan Transaksi 08-11-2025 - 08-11-2025": "08/11/2025 09:09",
+    "__EMPTY": 983251163,
+    "__EMPTY_1": "SP20",
+    "__EMPTY_2": "Telkomsel",
+    "__EMPTY_3": "Telkomsel Promo 20.000",
+    "__EMPTY_4": "082364236527",
+    "__EMPTY_5": "03964900000811008379",
+    "__EMPTY_6": 19829,
+    "__EMPTY_7": 20671,
+    "__EMPTY_8": 862,
+    "__EMPTY_9": "Sukses"
+  }
 ]
